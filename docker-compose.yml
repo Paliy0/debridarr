@@ -1,0 +1,27 @@
+version: "3.8"
+
+services:
+  realdebrid-tool:
+    build: .
+    container_name: rd-tool
+    environment:
+      - RD_TOKEN=${RD_TOKEN:-your_api_token_here}
+      - RD_DOWNLOAD_DIR=/downloads
+      - RD_MAX_CONCURRENT_DOWNLOADS=3
+    volumes:
+      - rd-downloads:/downloads
+      # Optional: Mount NAS media directory for direct writes to NAS
+      # - /mnt/media/Downloads:/downloads:rw
+    ports:
+      - "8080:8080"
+    restart: "no"  # On-demand service, not auto-start
+    networks:
+      - default
+
+volumes:
+  rd-downloads:
+    driver: local
+
+networks:
+  default:
+    driver: bridge
