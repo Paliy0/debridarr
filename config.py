@@ -20,8 +20,6 @@ class Settings(BaseSettings):
     host: str = "0.0.0.0"
     port: int = 8080
 
-    model_config = {"env_prefix": "RD_"}
-
     def get_token(self) -> str:
         """Get API token, checking file if configured."""
         if self.rd_token_file:
