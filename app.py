@@ -1,6 +1,7 @@
 """FastAPI web interface for Real-Debrid automation."""
 
 import asyncio
+import logging
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException, BackgroundTasks
 from pydantic import BaseModel, Field
@@ -9,6 +10,9 @@ from typing import Optional
 from config import settings
 from rd_api import RealDebridClient, RealDebridError
 from download_manager import DownloadManager
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger("rd-tool")
 
 
 # Global instances

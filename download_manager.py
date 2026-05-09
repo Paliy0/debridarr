@@ -2,11 +2,15 @@
 
 import asyncio
 import httpx
+import logging
 import os
 from pathlib import Path
-from typing import Optional, Callable
-from dataclasses import dataclass
+from typing import Optional
+from dataclasses import dataclass, field
 from datetime import datetime
+
+
+logger = logging.getLogger("download_manager")
 
 
 @dataclass
@@ -49,6 +53,7 @@ class DownloadManager:
         self.output_dir.mkdir(parents=True, exist_ok=True)
         self.max_concurrent = max_concurrent
         self._downloads: dict[str, DownloadProgress] = {}
+        self._tasks: dict[str, asyncio.Task] = {}
         self._semaphore = asyncio.Semaphore(max_concurrent)
 
     def get_progress(self, download_id: str) -> Optional[DownloadProgress]:
@@ -76,7 +81,10 @@ class DownloadManager:
         )
         self._downloads[download_id] = progress
 
-        asyncio.create_task(self._download(download_id, url, filename, password))
+        # Store task reference to prevent GC
+        task = asyncio.create_task(self._download(download_id, url, filename, password))
+        self._tasks[download_id] = task
+        task.add_done_callback(lambda t: self._tasks.pop(download_id, None))
         return download_id
 
     async def _download(
@@ -96,12 +104,15 @@ class DownloadManager:
             if password:
                 headers["Authorization"] = f"Bearer {password}"
 
+            logger.info(f"Starting download: {filename} → {output_path}")
+
             try:
                 async with httpx.AsyncClient(timeout=httpx.Timeout(300.0, connect=10.0)) as client:
                     async with client.stream("GET", url, headers=headers) as response:
                         response.raise_for_status()
 
                         progress.total_size = int(response.headers.get("content-length", 0))
+                        logger.info(f"File size: {progress.total_size / (1024**2):.1f}MB")
 
                         with open(output_path, "wb") as f:
                             last_update = datetime.now()
@@ -126,10 +137,12 @@ class DownloadManager:
 
                 progress.status = "completed"
                 progress.completed_at = datetime.now()
+                logger.info(f"Download completed: {output_path}")
 
             except Exception as e:
                 progress.status = "failed"
                 progress.error = str(e)
+                logger.error(f"Download failed for {filename}: {e}")
                 if output_path.exists():
                     output_path.unlink()
 
