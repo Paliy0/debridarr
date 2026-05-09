@@ -82,7 +82,7 @@ async def check_link(req: UnrestrictRequest):
 async def unrestrict_link(req: UnrestrictRequest):
     """Unrestrict a link and return download URL."""
     try:
-        result = await rd_client.unrestrict-link(req.link, req.password)
+        result = await rd_client.unrestrict_link(req.link, req.password)
         return result
     except RealDebridError as e:
         raise HTTPException(status_code=400, detail=str(e))
@@ -93,7 +93,7 @@ async def unrestrict_and_download(req: UnrestrictRequest, background_tasks: Back
     """Unrestrict a link and start downloading the file."""
     try:
         # Unrestrict the link
-        result = await rd_client.unrestrict-link(req.link, req.password)
+        result = await rd_client.unrestrict_link(req.link, req.password)
 
         # Start download
         download_url = result.get("download")
