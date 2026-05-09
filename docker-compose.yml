@@ -5,13 +5,12 @@ services:
     build: .
     container_name: rd-tool
     environment:
-      - RD_TOKEN=${RD_TOKEN:-your_api_token_here}
+      - RD_TOKEN
       - RD_DOWNLOAD_DIR=/downloads
       - RD_MAX_CONCURRENT_DOWNLOADS=3
     volumes:
-      # Downloads land on NAS at /storage-pool/media/rd-downloads
-      # CT 101 binds to NAS via Samba mount or shared storage
-      - /mnt/nas/rd-downloads:/downloads
+      # Downloads land on NAS alongside qBittorrent complete downloads
+      - /storage-pool/media/downloads/complete:/downloads
     ports:
       - "8080:8080"
     restart: "no"  # On-demand service, not auto-start
