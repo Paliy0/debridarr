@@ -8,9 +8,9 @@ services:
       - RD_TOKEN
       - RD_DOWNLOAD_DIR=/downloads
       - RD_MAX_CONCURRENT_DOWNLOADS=3
-    volumes:
-      # Downloads land on NAS alongside qBittorrent complete downloads
-      - /storage-pool/media/downloads/complete:/downloads
+    # /downloads is already bind-mounted via Proxmox LXC mp2
+    # to /storage-pool/media/downloads/complete on the ZFS pool
+    # No Docker volume needed — just write to the mount
     ports:
       - "8080:8080"
     restart: "no"  # On-demand service, not auto-start
