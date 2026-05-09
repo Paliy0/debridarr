@@ -8,9 +8,10 @@ services:
       - RD_TOKEN
       - RD_DOWNLOAD_DIR=/downloads
       - RD_MAX_CONCURRENT_DOWNLOADS=3
-    # /downloads is already bind-mounted via Proxmox LXC mp2
-    # to /storage-pool/media/downloads/complete on the ZFS pool
-    # No Docker volume needed — just write to the mount
+    volumes:
+      # CT 101 has /downloads bind-mounted to ZFS pool (mp2)
+      # Mount it into the container at the same path
+      - /downloads:/downloads
     ports:
       - "8080:8080"
     restart: "no"  # On-demand service, not auto-start
