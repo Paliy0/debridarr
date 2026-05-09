@@ -69,7 +69,7 @@ def check(ctx, link, password):
 
     async def _run():
         try:
-            result = await client.check-link(link)
+            result = await client.check_link(link)
             console.print(json.dumps(result, indent=2))
         except RealDebridError as e:
             console.print(f"[red]Error:[/red] {e}")
@@ -96,7 +96,7 @@ def unrestrict(ctx, link, password, download, output_dir):
             ) as progress:
                 task = progress.add_task("Unrestriciting link...", total=None)
 
-                result = await client.unrestrict-link(link, password)
+                result = await client.unrestrict_link(link, password)
                 progress.update(task, description="[green]Link unrestricited![/green]")
 
             console.print(json.dumps(result, indent=2))
