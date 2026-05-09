@@ -9,18 +9,14 @@ services:
       - RD_DOWNLOAD_DIR=/downloads
       - RD_MAX_CONCURRENT_DOWNLOADS=3
     volumes:
-      - rd-downloads:/downloads
-      # Optional: Mount NAS media directory for direct writes to NAS
-      # - /mnt/media/Downloads:/downloads:rw
+      # Downloads land on NAS at /storage-pool/media/rd-downloads
+      # CT 101 binds to NAS via Samba mount or shared storage
+      - /mnt/nas/rd-downloads:/downloads
     ports:
       - "8080:8080"
     restart: "no"  # On-demand service, not auto-start
     networks:
       - default
-
-volumes:
-  rd-downloads:
-    driver: local
 
 networks:
   default:
